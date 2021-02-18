@@ -4,8 +4,9 @@ Given /the following movies exist/ do |movies_table|
   movies_table.hashes.each do |movie|
     # each returned element will be a hash whose key is the table header.
     # you should arrange to add that movie to the database here.
+    Movie.create!(movie)
   end
-  fail "Unimplemented"
+  #fail "Unimplemented"
 end
 
 Then /(.*) seed movies should exist/ do | n_seeds |
@@ -18,21 +19,57 @@ end
 Then /I should see "(.*)" before "(.*)"/ do |e1, e2|
   #  ensure that that e1 occurs before e2.
   #  page.body is the entire content of the page as a string.
-  fail "Unimplemented"
+  # mat = "//table[@id='movies']//td[2]"
+  expect(page).to have_text "#{e1}"
+  expect(page).to have_text "#{e2}"
+  s = page.body
+  s.delete!("\n")
+  if !(s.match?(/#{e1}.*#{e2}/))
+    fail
+  end
 end
 
 # Make it easier to express checking or unchecking several boxes at once
 #  "When I uncheck the following ratings: PG, G, R"
 #  "When I check the following ratings: G"
 
-When /I (un)?check the following ratings: (.*)/ do |uncheck, rating_list|
+When /I (un)?check the following ratings: +"(.*)"$/ do |uncheck, rating_list|
   # HINT: use String#split to split up the rating_list, then
   #   iterate over the ratings and reuse the "When I check..." or
   #   "When I uncheck..." steps in lines 89-95 of web_steps.rb
-  fail "Unimplemented"
+  # fail "Unimplemented"
+  ratings = rating_list.split;
+  ratings.each do |r|
+    if (uncheck)
+      uncheck("ratings_#{r}")
+    else
+      check("ratings_#{r}")
+    end
+  end
+  
 end
+
+Then /I should (not )?see the following ratings: +"(.*)"$/ do |yes, ratings|
+  hash = Hash[(ratings.split).map {|rating| [rating, 1]} ]
+  mat = "//table[@id='movies']//td[2]"
+  page.all(:xpath, mat) do |r|
+      if yes
+        if (hash.key?(r.text)) 
+          fail "Not expected but found: #{r}"
+        end
+      else
+        if !(hash.key?(r.text))
+          fail "Expected but not found: #{r}"
+        end
+      end
+  end
+end
+
 
 Then /I should see all the movies/ do
   # Make sure that all the movies in the app are visible in the table
-  fail "Unimplemented"
+  within("//table[@id='movies']") do
+    expect(all('tr').count).to eq(11)
+  end
 end
+
