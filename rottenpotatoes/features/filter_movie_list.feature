@@ -35,7 +35,7 @@ Scenario: restrict to movies with 'PG' or 'R' ratings
   Then I should be on the RottenPotatoes home page
   And I should see the following ratings: "PG R"
   And I should not see the following ratings: "G PG-13 NC-17"
-
+  
 
 Scenario: all ratings selected
   When I check the following ratings: "PG R G PG-13 NC-17"
