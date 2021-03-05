@@ -26,19 +26,19 @@ Feature: display list of movies filtered by MPAA rating
   # enter step(s) to ensure that PG and R movies are visible
   # enter step(s) to ensure that other movies are not visible
   #Given I am on the RottenPotatoes home page
-  Scenario: restrict to movies with 'PG' or 'R' ratings         # features/filter_movie_list.feature:31
-    When I check the following ratings: "PG R"                  # features/step_definitions/movie_steps.rb:36
-    And I uncheck the following ratings: "G PG-13 NC-17"        # features/step_definitions/movie_steps.rb:36
-    And I press "Refresh"                                       # features/step_definitions/web_steps.rb:52
-    Then I should be on the RottenPotatoes home page            # features/step_definitions/web_steps.rb:230
-    And I should see the following ratings: "PG R"              # features/step_definitions/movie_steps.rb:52
-    And I should not see the following ratings: "G PG-13 NC-17" # features/step_definitions/movie_steps.rb:52
+  Scenario: restrict to movies with 'PG' or 'R' ratings   # features/filter_movie_list.feature:31
+    When I check the following ratings: "PG R"            # features/step_definitions/movie_steps.rb:36
+    And I uncheck the following ratings: "G PG-13"        # features/step_definitions/movie_steps.rb:36
+    And I press "Refresh"                                 # features/step_definitions/web_steps.rb:52
+    Then I should be on the RottenPotatoes home page      # features/step_definitions/web_steps.rb:230
+    And I should see the following ratings: "PG R"        # features/step_definitions/movie_steps.rb:52
+    And I should not see the following ratings: "G PG-13" # features/step_definitions/movie_steps.rb:52
 
-  Scenario: all ratings selected                             # features/filter_movie_list.feature:40
-    When I check the following ratings: "PG R G PG-13 NC-17" # features/step_definitions/movie_steps.rb:36
-    And I press "Refresh"                                    # features/step_definitions/web_steps.rb:52
-    Then I should be on the RottenPotatoes home page         # features/step_definitions/web_steps.rb:230
-    And I should see all the movies                          # features/step_definitions/movie_steps.rb:69
+  Scenario: all ratings selected                       # features/filter_movie_list.feature:40
+    When I check the following ratings: "PG R G PG-13" # features/step_definitions/movie_steps.rb:36
+    And I press "Refresh"                              # features/step_definitions/web_steps.rb:52
+    Then I should be on the RottenPotatoes home page   # features/step_definitions/web_steps.rb:230
+    And I should see all the movies                    # features/step_definitions/movie_steps.rb:69
 
 Feature: display list of movies sorted by different criteria
   As an avid moviegoer
@@ -81,4 +81,4 @@ Feature: display list of movies sorted by different criteria
 
 4 scenarios (4 passed)
 36 steps (36 passed)
-0m0.662s
+0m0.708s

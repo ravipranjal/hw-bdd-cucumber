@@ -7,26 +7,35 @@ class MoviesController < ApplicationController
   end
 
   def index
-    sort = params[:sort] || session[:sort]
-    case sort
-    when 'title'
-      ordering,@title_header = {:title => :asc}, 'bg-warning hilite'
-    when 'release_date'
-      ordering,@date_header = {:release_date => :asc}, 'bg-warning hilite'
-    end
     @all_ratings = Movie.all_ratings
-    @selected_ratings = params[:ratings] || session[:ratings] || {}
-
-    if @selected_ratings == {}
-      @selected_ratings = Hash[@all_ratings.map {|rating| [rating, rating]}]
+    session.clear if(request.path == '/')
+  
+    if (params[:field_to_sort].present? )
+      @to_sort = params[:field_to_sort]
+    else
+      @to_sort = ''
     end
-
-    if params[:sort] != session[:sort] or params[:ratings] != session[:ratings]
-      session[:sort] = sort
-      session[:ratings] = @selected_ratings
-      redirect_to :sort => sort, :ratings => @selected_ratings and return
+    
+    if (params[:ratings].present? )
+      rating = params[:ratings].keys
+      @ratings_to_show = rating
+    else
+      rating = @all_ratings
+      @ratings_to_show = []
     end
-    @movies = Movie.where(rating: @selected_ratings.keys).order(ordering)
+    
+    if(params[:here].present?)
+      session[:ratings] = rating
+      session[:field_to_sort] = @to_sort
+      session[:ratings_to_show] = @ratings_to_show
+    else
+      rating = session[:ratings].present? ? session[:ratings] : rating
+      @ratings_to_show = session[:ratings_to_show].present? ? session[:ratings_to_show] : @ratings_to_show
+      @to_sort = session[:field_to_sort].present? ? session[:field_to_sort] : @to_sort
+    end
+    
+    @movies = Movie.with_ratings(rating, @to_sort)
+    
   end
 
   def new
@@ -34,7 +43,7 @@ class MoviesController < ApplicationController
   end
 
   def create
-    @movie = Movie.create!(params[:movie])
+    @movie = Movie.create!(movie_params)
     flash[:notice] = "#{@movie.title} was successfully created."
     redirect_to movies_path
   end
@@ -45,7 +54,7 @@ class MoviesController < ApplicationController
 
   def update
     @movie = Movie.find params[:id]
-    @movie.update_attributes!(params[:movie])
+    @movie.update_attributes!(movie_params)
     flash[:notice] = "#{@movie.title} was successfully updated."
     redirect_to movie_path(@movie)
   end
@@ -56,10 +65,11 @@ class MoviesController < ApplicationController
     flash[:notice] = "Movie '#{@movie.title}' deleted."
     redirect_to movies_path
   end
-  
-  private
-    def movie_params
-      params.require(:movie).permit(:title, :rating, :description, :release_date)
-    end
 
+  private
+  # Making "internal" methods private is not required, but is a common practice.
+  # This helps make clear which methods respond to requests, and which ones do not.
+  def movie_params
+    params.require(:movie).permit(:title, :rating, :description, :release_date)
+  end
 end
